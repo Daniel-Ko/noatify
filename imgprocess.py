@@ -88,14 +88,14 @@ def process(img):
     modimg = img.copy()
 
     modimg = grayscale(modimg)
-    modimg = denoise(modimg)
-    # modimg = cv2.threshold(gray, 127, 255,
-	# 	cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+    # modimg = denoise(modimg)
+    modimg = cv2.threshold(modimg, 127, 255,
+		cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
 
 
     # modimg = filter_black(modimg)
     modimg = deskew(modimg)
-    modimg = enhance(modimg)
+    # modimg = enhance(modimg)
 
     # cv2.imshow("hey", modimg)
     # cv2.waitKey(0)

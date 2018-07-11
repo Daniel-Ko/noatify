@@ -3,6 +3,7 @@ import os
 import os.path
 import shutil
 import ocr
+import argparse
 
 import sklearn.pipeline
 from sklearn.decomposition import TruncatedSVD
@@ -52,9 +53,17 @@ def process(text_strings, filenames, true_k):
     return result
 
 def main():
-    input_dir = sys.argv[1]
-    output_dir = sys.argv[2]
-    num_clusters = int(sys.argv[3])
+    import time
+    start = time.time()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("input_dir", help="Images directory to read from")
+    parser.add_argument("output_dir", help="Output directory to write to")
+    parser.add_argument("clusternum", type=int, help="Num images to cluster")
+    args = parser.parse_args()
+
+    input_dir = args.input_dir
+    output_dir = args.output_dir
+    num_clusters = args.clusternum
 
     filenames = [fname for fname in os.listdir(input_dir) if fname.lower().endswith('.png')]
     text_strings = []
@@ -81,7 +90,9 @@ def main():
             src_path = os.path.join(input_dir, fname)
             dst_path = os.path.join(cluster_dir, fname)
             shutil.copyfile(src_path, dst_path)
-    print('Done.')
+
+    end = time.time()
+    print("Done. [RUNTIME] {} sec".format(end - start))
 
 if __name__ == '__main__':
     main()
