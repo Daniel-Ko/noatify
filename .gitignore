@@ -9,6 +9,9 @@ pip-delete-this-directory.txt
 *.PNG
 *.PNG
 *.txt
+food_test/
+recipe_test/
+tests/
 
 .env
 .venv

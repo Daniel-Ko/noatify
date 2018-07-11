@@ -65,11 +65,11 @@ def mask(img):
 def process(img):
     img = cv2.threshold(img, 0, 255, 
 		cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-    cv2.imshow("THRESH", img)
+    # cv2.imshow("THRESH", img)
     # mask(img)
     # threshold = cv2.medianBlur(threshold, 3)
     # select regions
-    mser(img)
+    # mser(img)
     # deskew(img)   
     # mask(img)
     return img
