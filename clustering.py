@@ -27,7 +27,6 @@ def process(text_strings, filenames, true_k):
     normalizer = Normalizer(copy=False)
     lsa = sklearn.pipeline.make_pipeline(svd, normalizer)
     X = lsa.fit_transform(X)
-    explained_variance = svd.explained_variance_ratio_.sum()
 
     km = KMeans(
         n_clusters=true_k, init='k-means++', max_iter=100, n_init=1,
