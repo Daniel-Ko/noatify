@@ -37,7 +37,7 @@ def runOCR(img_name):
 
     try:
         with Image.open(tempfname) as img:
-            return pytesseract.image_to_string(image)
+            return pytesseract.image_to_string(img)
         # f.write("============================\nIMAGE_STR\n============================\n")
         # f.write(pytesseract.image_to_string(img).encode('utf-8').decode('utf-8'))
         # f.write("\n\n============================\nBOUNDING BOXES\n============================\n")
