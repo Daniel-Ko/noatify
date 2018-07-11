@@ -21,7 +21,10 @@ def process(text_strings, filenames, true_k):
         min_df=2, stop_words='english',
         use_idf=True
     )
-    X = vectorizer.fit_transform(text_strings)
+    try:
+        X = vectorizer.fit_transform(text_strings)
+    except ValueError as e:
+        print("Failed to analyze: " + e)
 
     print('Performing dimensionality reduction using latent semantic analysis...')
     svd = TruncatedSVD(N_COMPONENTS)
