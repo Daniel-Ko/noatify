@@ -26,46 +26,50 @@ if sys.stderr.encoding != 'cp850':
 
 
 def runOCR(img_name):
+    # Set tesseract path manually and the config
     pytesseract.pytesseract.tesseract_cmd = r'C:\\Program Files (x86)\\Tesseract-OCR\\tesseract'
-
+    config = ('-l eng --oem 1 --psm 3')
+    
+    # Open image 
     modimg = cv2.imread(img_name)
-    gray = cv2.cvtColor(modimg, cv2.COLOR_BGR2GRAY)
-    gray = cv2.bitwise_not(gray)
+    
+    # Preprocess image
+    modimg = imgprocess.process(modimg)
 
+    # Temporarily write image to file (remove in finally clause)
     tempfname = "{}.png".format(getpid())
-    cv2.imwrite(tempfname, gray)
+    cv2.imwrite(tempfname, modimg)
 
-    gray = imgprocess.process(gray)
+    try:
+        img = Image.open(tempfname)
+        # f.write("============================\nIMAGE_STR\n============================\n")
+        # f.write(pytesseract.image_to_string(img).encode('utf-8').decode('utf-8'))
+        # f.write("\n\n============================\nBOUNDING BOXES\n============================\n")
+        # f.write(pytesseract.image_to_boxes(img).encode('utf-8').decode('utf-8'))
+        # f.write("\n\n============================\nIMAGE_DATA\n============================\n")
+        # f.write(pytesseract.image_to_data(img).encode('utf-8').decode('utf-8'))
 
-    with open("output.txt", "w", encoding='utf-8') as f:
-        try:
-            img = Image.open(tempfname)
-            # f.write("============================\nIMAGE_STR\n============================\n")
-            # f.write(pytesseract.image_to_string(img).encode('utf-8').decode('utf-8'))
-            # f.write("\n\n============================\nBOUNDING BOXES\n============================\n")
-            # f.write(pytesseract.image_to_boxes(img).encode('utf-8').decode('utf-8'))
-            # f.write("\n\n============================\nIMAGE_DATA\n============================\n")
-            # f.write(pytesseract.image_to_data(img).encode('utf-8').decode('utf-8'))
+        # print("============================\nSCRIPT INFO\n============================")
+        # print(pytesseract.image_to_osd(img).encode('utf-8').decode('utf-8'))
+    except IOError:
+        print("file couldn't be opened")
+    finally:
+        output = pytesseract.image_to_string(img).encode('utf-8').decode('utf-8')
+        
+        img.close()
+        remove(tempfname)
+        
+        # cv2.imshow("Image", modimg)
+        # cv2.imshow("Output", gray)
+        # cv2.waitKey(0)
 
-            # print("============================\nSCRIPT INFO\n============================")
-            # print(pytesseract.image_to_osd(img).encode('utf-8').decode('utf-8'))
-        except IOError:
-            print("file couldn't be opened")
-        finally:
-            output = pytesseract.image_to_string(img).encode('utf-8').decode('utf-8')
-            img.close()
-            remove(tempfname)
-            
-            # cv2.imshow("Image", modimg)
-            # cv2.imshow("Output", gray)
-            # cv2.waitKey(0)
-            return output
+        return output
+
             
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("image", help="Image filename")
+    parser.add_argument("images", nargs='+', help="Image filename")
     args = parser.parse_args()
 
-    img_name = args.image
-    runOCR(img_name)
+    runOCR(args.images)

@@ -4,25 +4,34 @@ from ocr import runOCR
 import argparse
 import io
 
-def main(img_name):
-    string = runOCR(img_name)
-    r = Rake()
+def main(img_names):
 
-    r.extract_keywords_from_text(string)
-    keywords = r.get_ranked_phrases()
+    image_to_ocrtext = {}
 
-    with io.open("keywords_output.txt", "w", encoding='utf8') as f:
-        for keyword in keywords:
-            f.write("{}\n".format(keyword.encode('utf-8').decode('utf-8')))
-            # f.write('\n')
+    for img_name in img_names:
+        string = runOCR(img_name)
+
+        # Output OCR'd string is mapped to image
+        image_to_ocrtext[img_name] = string
+
+        r = Rake(max_length=2)
+
+        
+        r.extract_keywords_from_text(string)
+        keywords = r.get_ranked_phrases()
+
+        with io.open("keywords_output.txt", "a", encoding='utf8') as f:
+            for keyword in keywords:
+                f.write("{}\n".format(keyword.encode('utf-8').decode('utf-8')))
 
 if __name__ == "__main__":
     import time
     start = time.time()
     parser = argparse.ArgumentParser()
-    parser.add_argument("image", help="Image filename")
+    parser.add_argument("images", nargs='+', help="Image filename")
     args = parser.parse_args()
+    
+    main(args.images)
 
-    main(args.image)
     end = time.time()
-    print(end - start)
+    print("[RUNTIME] {} sec".format(end - start))

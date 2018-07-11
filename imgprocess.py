@@ -8,29 +8,26 @@ def deskew(img):
     if angle < -45:
 	    angle = -(90 + angle)
     else:
-        angle= -angle
+        angle = -angle
 
     (h, w) = img.shape[:2]
     center = (w // 2, h // 2)
     M = cv2.getRotationMatrix2D(center, angle, 1.0)
     rotated = cv2.warpAffine(img, M, (w, h),
-    flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+	    flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
 
     # draw the correction angle on the image so we can validate it
-    cv2.putText(rotated, "Angle: {:.2f} degrees".format(angle),
-	    (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+    # cv2.putText(rotated, "Angle: {:.2f} degrees".format(angle),
+	#     (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
  
     # show the output image
     print("[INFO] angle: {:.3f}".format(angle))
 
-    cv2.imshow("b4rotation", img)
-    cv2.imshow("Rotated", rotated)
-    cv2.waitKey(0)
+    return rotated
 
 
 
 def mser(img):
-
     mser = cv2.MSER_create()
 
     # vis = img.copy()
@@ -62,14 +59,35 @@ def mask(img):
     cv2.imshow("contours", img)
     cv2.waitKey(0)
 
-def process(img):
-    img = cv2.threshold(img, 0, 255, 
+def filter_black(img):
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    threshold = cv2.threshold(gray, 0, 255, 
 		cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-    # cv2.imshow("THRESH", img)
+    mask_inv = cv2.bitwise_not(threshold)
+    
+    # mask1 = cv2.inRange(mask_inv, 0, 255)
+    # mask1 = cv2.morphologyEx(mask1, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)))
+    # mask1 = cv2.Canny(mask1, 100, 300)
+    # mask1 = cv2.GaussianBlur(mask1, (1, 1), 0)
+    # mask1 = cv2.Canny(mask1, 100, 300)
+
+    return mask_inv
+
+def process(img):
+    modimg = img.copy()
+    
+    modimg = filter_black(modimg)
+    modimg = deskew(modimg)
+
+    cv2.imshow("hey", modimg)
+    cv2.waitKey(0)
+
+    
+    
     # mask(img)
     # threshold = cv2.medianBlur(threshold, 3)
     # select regions
     # mser(img)
     # deskew(img)   
     # mask(img)
-    return img
+    return modimg
