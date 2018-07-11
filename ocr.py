@@ -28,7 +28,10 @@ if sys.stderr.encoding != 'cp850':
 
 def runOCR(img_name):
     # Set tesseract path manually and the config
-    pytesseract.pytesseract.tesseract_cmd = r'C:\\Program Files (x86)\\Tesseract-OCR\\tesseract'
+    if os.name == 'nt':
+        pytesseract.pytesseract.tesseract_cmd = r'C:\\Program Files (x86)\\Tesseract-OCR\\tesseract'
+    else:
+        pytesseract.pytesseract.tesseract_cmd = '/usr/local/bin/tesseract'
     config = ('-l eng --oem 1 --psm 3')
     
     # Open image 
@@ -42,7 +45,8 @@ def runOCR(img_name):
     cv2.imwrite(tempfname, modimg)
 
     try:
-        img = Image.open(tempfname)
+        with Image.open(tempfname) as img:
+            return pytesseract.image_to_string(image)
         # f.write("============================\nIMAGE_STR\n============================\n")
         # f.write(pytesseract.image_to_string(img).encode('utf-8').decode('utf-8'))
         # f.write("\n\n============================\nBOUNDING BOXES\n============================\n")
@@ -52,19 +56,11 @@ def runOCR(img_name):
 
         # print("============================\nSCRIPT INFO\n============================")
         # print(pytesseract.image_to_osd(img).encode('utf-8').decode('utf-8'))
-    except IOError:
+    except IOError as e:
         print("file couldn't be opened")
     finally:
-        output = pytesseract.image_to_string(img).encode('utf-8').decode('utf-8')
-        
         img.close()
         remove(tempfname)
-        
-        # cv2.imshow("Image", modimg)
-        # cv2.imshow("Output", gray)
-        # cv2.waitKey(0)
-
-        return output
 
             
 

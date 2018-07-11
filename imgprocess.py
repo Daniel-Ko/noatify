@@ -60,10 +60,8 @@ def mask(img):
     # cv2.waitKey(0)
 
 def filter_black(img):
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    threshold = cv2.threshold(gray, 0, 255, 
-		cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-    mask_inv = cv2.bitwise_not(threshold)
+    # mask_inv = cv2.bitwise_not(threshold)
+    mask_inv = cv2.bitwise_not(img)
     
     # mask1 = cv2.inRange(mask_inv, 0, 255)
     # mask1 = cv2.morphologyEx(mask1, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)))
@@ -73,11 +71,31 @@ def filter_black(img):
 
     return mask_inv
 
+def enhance(img):
+    kernel = np.ones((3,3),np.uint8)
+    enhanced = cv2.erode(img,kernel,iterations = 1)
+    return enhanced
+
+def grayscale(img):
+    return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+def denoise(img):
+    denoised_gray = cv2.fastNlMeansDenoising(img, None, 9, 13)
+    source_blur = cv2.GaussianBlur(denoised_gray, (5,5), 3)
+    return source_blur
+
 def process(img):
     modimg = img.copy()
+
+    modimg = grayscale(modimg)
+    modimg = denoise(modimg)
+    # modimg = cv2.threshold(gray, 127, 255, 
+	# 	cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
     
-    modimg = filter_black(modimg)
+    
+    # modimg = filter_black(modimg)
     modimg = deskew(modimg)
+    modimg = enhance(modimg)
 
     cv2.imshow("hey", modimg)
     cv2.waitKey(0)
@@ -87,7 +105,7 @@ def process(img):
     # mask(img)
     # threshold = cv2.medianBlur(threshold, 3)
     # select regions
-    mser(img)
+    # mser(img)
     # deskew(img)
     # mask(img)
     return modimg
