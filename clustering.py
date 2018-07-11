@@ -62,7 +62,7 @@ def main():
     print('Performing OCR...')
     for fname in filenames:
         print('\tProcessing {0}'.format(fname))
-        text = ocr.ocr(os.path.join(input_dir, fname))
+        text = ocr.runOCR(os.path.join(input_dir, fname))
         text_strings.append(text)
 
     result = process(text_strings, filenames, num_clusters)
