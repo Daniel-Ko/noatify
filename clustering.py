@@ -5,10 +5,13 @@ import shutil
 import ocr
 
 import sklearn.pipeline
+from sklearn.decomposition import TruncatedSVD
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.preprocessing import Normalizer
 from sklearn.cluster import KMeans
 
 N_FEATURES = 10000
+N_COMPONENTS = 10
 
 def process(text_strings, filenames, true_k):
     print('Extracting features using a sparse vectoriser...');
@@ -19,6 +22,13 @@ def process(text_strings, filenames, true_k):
     )
     X = vectorizer.fit_transform(text_strings)
 
+    print('Performing dimensionality reduction using latent semantic analysis...')
+    svd = TruncatedSVD(N_COMPONENTS)
+    normalizer = Normalizer(copy=False)
+    lsa = sklearn.pipeline.make_pipeline(svd, normalizer)
+    X = lsa.fit_transform(X)
+    explained_variance = svd.explained_variance_ratio_.sum()
+
     km = KMeans(
         n_clusters=true_k, init='k-means++', max_iter=100, n_init=1,
         verbose=True
@@ -27,7 +37,8 @@ def process(text_strings, filenames, true_k):
     print('Performing K-means clustering...')
     km.fit(X)
 
-    order_centroids = km.cluster_centers_.argsort()[:, ::-1]
+    original_space_centroids = svd.inverse_transform(km.cluster_centers_)
+    order_centroids = original_space_centroids.argsort()[:, ::-1]
 
     terms = vectorizer.get_feature_names()
 
