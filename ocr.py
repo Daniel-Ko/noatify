@@ -4,12 +4,13 @@ import cv2
 from os import getpid, remove
 import imgprocess
 
+import os
 import sys
 import codecs
 import argparse
 
-"""TODO: 
-1: MORE PREPROCESSING () 
+"""TODO:
+1: MORE PREPROCESSING ()
 2: KNN ON TYPOS
 3: WORD ASSOCIATION
 """
@@ -27,7 +28,10 @@ parser.add_argument("image", help="Image filename")
 args = parser.parse_args()
 
 
-pytesseract.pytesseract.tesseract_cmd = r'C:\\Program Files (x86)\\Tesseract-OCR\\tesseract'
+if os.name == 'nt':
+    pytesseract.pytesseract.tesseract_cmd = r'C:\\Program Files (x86)\\Tesseract-OCR\\tesseract'
+else:
+    pytesseract.pytesseract.tesseract_cmd = '/usr/local/bin/tesseract'
 
 img_name = args.image
 
@@ -44,21 +48,9 @@ gray = imgprocess.process(gray)
 with open("output.txt", "w", encoding='utf-8') as f:
     try:
         img = Image.open(tempfname)
-        f.write("============================\nIMAGE_STR\n============================\n")
         f.write(pytesseract.image_to_string(img).encode('utf-8').decode('utf-8'))
-        f.write("\n\n============================\nBOUNDING BOXES\n============================\n")
-        f.write(pytesseract.image_to_boxes(img).encode('utf-8').decode('utf-8'))
-        f.write("\n\n============================\nIMAGE_DATA\n============================\n")
-        f.write(pytesseract.image_to_data(img).encode('utf-8').decode('utf-8'))
-
-        # print("============================\nSCRIPT INFO\n============================")
-        # print(pytesseract.image_to_osd(img).encode('utf-8').decode('utf-8'))
-    except IOError:
-        print("file couldn't be opened")
+    except IOError as e:
+        print("Error occurred during OCR")
     finally:
         img.close()
         remove(tempfname)
-
-        cv2.imshow("Image", modimg)
-        cv2.imshow("Output", gray)
-        cv2.waitKey(0)
