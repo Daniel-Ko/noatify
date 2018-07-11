@@ -44,6 +44,7 @@ def process(text_strings, filenames, true_k):
 def main():
     input_dir = sys.argv[1]
     output_dir = sys.argv[2]
+    num_clusters = int(sys.argv[3])
 
     filenames = [fname for fname in os.listdir(input_dir) if fname.lower().endswith('.png')]
     text_strings = []
@@ -53,7 +54,7 @@ def main():
         text = ocr.ocr(os.path.join(input_dir, fname))
         text_strings.append(text)
 
-    result = process(text_strings, filenames, 5)
+    result = process(text_strings, filenames, num_clusters)
 
     print('Copying files...')
     try:
