@@ -20,7 +20,8 @@ def main(img_names):
         r.extract_keywords_from_text(string)
         keywords = r.get_ranked_phrases()
 
-        with io.open("keywords_output.txt", "a", encoding='utf8') as f:
+        with io.open("keywords_output.txt", "w", encoding='utf8') as f:
+            f.write(string)
             for keyword in keywords:
                 f.write("{}\n".format(keyword.encode('utf-8').decode('utf-8')))
 
