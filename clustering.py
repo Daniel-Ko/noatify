@@ -1,6 +1,7 @@
 import sys
 import os
 import os.path
+import shutil
 import ocr
 
 import sklearn.pipeline
@@ -29,12 +30,16 @@ def process(text_strings, filenames, true_k):
     order_centroids = km.cluster_centers_.argsort()[:, ::-1]
 
     terms = vectorizer.get_feature_names()
+
+    result = []
     for cluster_idx in range(true_k):
         print('Cluster #{0}: '.format(cluster_idx + 1))
         print('\tKey words: {0}'.format(' '.join(terms[ind] for ind in order_centroids[cluster_idx, :10])))
-        print('\tFiles: #{0}: {1}'.format(cluster_idx + 1, ', '.join(
-            fname for j, fname in enumerate(filenames) if km.labels_[j] == cluster_idx
-        )))
+        cluster_fnames = [fname for j, fname in enumerate(filenames) if km.labels_[j] == cluster_idx]
+        print('\tFiles: #{0}: {1}'.format(cluster_idx + 1, ', '.join(cluster_fnames)))
+        result.append(cluster_fnames)
+
+    return result
 
 def main():
     input_dir = sys.argv[1]
@@ -47,7 +52,25 @@ def main():
         print('\tProcessing {0}'.format(fname))
         text = ocr.ocr(os.path.join(input_dir, fname))
         text_strings.append(text)
-    process(text_strings, filenames, 5)
+
+    result = process(text_strings, filenames, 5)
+
+    print('Copying files...')
+    try:
+        os.mkdir(output_dir)
+    except OSError:
+        pass
+    for cluster_idx, cluster_fnames in enumerate(result):
+        cluster_dir = os.path.join(output_dir, 'Cluster{0}'.format(cluster_idx + 1))
+        try:
+            os.mkdir(cluster_dir)
+        except OSError:
+            pass
+        for fname in cluster_fnames:
+            src_path = os.path.join(input_dir, fname)
+            dst_path = os.path.join(cluster_dir, fname)
+            shutil.copyfile(src_path, dst_path)
+    print('Done.')
 
 if __name__ == '__main__':
     main()
