@@ -21,10 +21,11 @@ def process(text_strings, filenames, true_k):
         min_df=2, stop_words='english',
         use_idf=True
     )
+    
     try:
         X = vectorizer.fit_transform(text_strings)
     except ValueError as e:
-        print("Failed to analyze: " + e)
+        print("Failed to analyze: " + str(e))
 
     print('Performing dimensionality reduction using latent semantic analysis...')
     svd = TruncatedSVD(N_COMPONENTS)
@@ -72,8 +73,10 @@ def main():
     text_strings = []
     print('Performing OCR...')
     for fname in filenames:
-        print('\tProcessing {0}'.format(fname))
+        print('\tProcessing {0}'.format(fname), end='')
+        startOCR = time.time()
         text = ocr.runOCR(os.path.join(input_dir, fname))
+        print(" {} sec".format(time.time() - startOCR))
         text_strings.append(text)
 
     result = process(text_strings, filenames, num_clusters)

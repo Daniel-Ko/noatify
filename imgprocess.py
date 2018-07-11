@@ -91,7 +91,7 @@ def process(img):
     # modimg = denoise(modimg)
     modimg = cv2.threshold(modimg, 127, 255,
 		cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-    # modimg = mser(modimg)
+    modimg = mser(modimg)
 
     # modimg = filter_black(modimg)
     modimg = deskew(modimg)
