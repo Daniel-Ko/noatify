@@ -19,7 +19,7 @@ def deskew(img):
     # draw the correction angle on the image so we can validate it
     # cv2.putText(rotated, "Angle: {:.2f} degrees".format(angle),
 	#     (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
- 
+
     # show the output image
     print("[INFO] angle: {:.3f}".format(angle))
 
@@ -62,7 +62,7 @@ def mask(img):
 def filter_black(img):
     # mask_inv = cv2.bitwise_not(threshold)
     mask_inv = cv2.bitwise_not(img)
-    
+
     # mask1 = cv2.inRange(mask_inv, 0, 255)
     # mask1 = cv2.morphologyEx(mask1, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)))
     # mask1 = cv2.Canny(mask1, 100, 300)
@@ -89,19 +89,19 @@ def process(img):
 
     modimg = grayscale(modimg)
     modimg = denoise(modimg)
-    # modimg = cv2.threshold(gray, 127, 255, 
+    # modimg = cv2.threshold(gray, 127, 255,
 	# 	cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-    
-    
+
+
     # modimg = filter_black(modimg)
     modimg = deskew(modimg)
     modimg = enhance(modimg)
 
-    cv2.imshow("hey", modimg)
-    cv2.waitKey(0)
+    # cv2.imshow("hey", modimg)
+    # cv2.waitKey(0)
 
-    
-    
+
+
     # mask(img)
     # threshold = cv2.medianBlur(threshold, 3)
     # select regions
